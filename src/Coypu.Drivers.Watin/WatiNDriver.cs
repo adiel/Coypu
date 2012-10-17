@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -157,6 +158,11 @@ namespace Coypu.Drivers.Watin
         public ElementFound FindFrame(string locator, Scope scope)
         {
             return BuildElement(elementFinder.FindFrame(locator, scope), "Failed to find frame: " + locator);
+        }
+
+        public void TakeScreenshot(string saveAs, DriverScope root, ImageFormat imageFormat)
+        {
+            throw new NotImplementedException();
         }
 
         private IEnumerable<Cookie> GetPersistentCookies(IE ieBrowser)

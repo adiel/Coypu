@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -41,5 +42,6 @@ namespace Coypu
         IEnumerable<Cookie> GetBrowserCookies();
         ElementFound FindWindow(string locator, Scope scope);
         ElementFound FindFrame(string locator, Scope scope);
+        void TakeScreenshot(string saveAs, DriverScope root, ImageFormat imageFormat);
     }
 }

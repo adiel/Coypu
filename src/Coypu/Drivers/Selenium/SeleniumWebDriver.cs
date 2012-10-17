@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium;
@@ -100,6 +101,13 @@ namespace Coypu.Drivers.Selenium
                 throw new MissingHtmlException("Failed to find frame: " + locator);
 
             return new SeleniumFrame(element, webDriver);
+        }
+
+        public void TakeScreenshot(string saveAs, DriverScope root, ImageFormat imageFormat)
+        {
+            var takesScreenshot = ((ITakesScreenshot) webDriver);
+
+            takesScreenshot.GetScreenshot().SaveAsFile(saveAs, imageFormat);
         }
 
         public ElementFound FindLink(string linkText, Scope scope)

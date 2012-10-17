@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -192,6 +193,11 @@ namespace Coypu.Tests.TestDoubles
         public ElementFound FindFrame(string locator, Scope root)
         {
             return null;
+        }
+
+        public void TakeScreenshot(string saveAs, DriverScope root, ImageFormat imageFormat)
+        {
+            throw new NotImplementedException();
         }
 
         public void SetBrowserCookies(Cookie cookie)
