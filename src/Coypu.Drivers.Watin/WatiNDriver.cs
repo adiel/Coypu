@@ -120,11 +120,6 @@ namespace Coypu.Drivers.Watin
             return retval;
         }
 
-        public ElementFound FindFieldset(string locator, Scope scope)
-        {
-            return BuildElement(elementFinder.FindFieldset(locator, scope), "Failed to find fieldset: " + locator);
-        }
-
         public ElementFound FindSection(string locator, Scope scope)
         {
             return BuildElement(elementFinder.FindSection(locator, scope), "Failed to find section: " + locator);

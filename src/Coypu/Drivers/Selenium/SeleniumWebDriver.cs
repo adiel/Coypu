@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Remote;
 using OpenQA.Selenium.Support.PageObjects;
 using Cookie = System.Net.Cookie;
 
@@ -107,14 +106,6 @@ namespace Coypu.Drivers.Selenium
             return BuildElement(Find(By.Id(id), scope, "id: " + id));
         }
 
-        public ElementFound FindFieldset(string locator, Scope scope)
-        {
-            var by = By.XPath(xPath.Format(".//fieldset[legend[text() = {0}] or @id = {0}]", locator.Trim()));
-            var fieldset = Find(by, scope, "fieldset: " + locator);
-
-            return BuildElement(fieldset);
-        }
-
         public ElementFound FindSection(string locator, Scope scope)
         {
             return BuildElement(sectionFinder.FindSection(locator,scope));
@@ -141,8 +132,19 @@ namespace Coypu.Drivers.Selenium
             return BuildElement(Find(By.XPath(xpath), scope, "xpath: " + xpath));
         }
 
-        public IEnumerable<ElementFound> FindAllCss(string cssSelector, Scope scope)
+        public IEnumerable<ElementFound> FindAllCss(string cssSelector, Scope scope, Regex textPattern)
         {
+            var textMatches = (textPattern == null)
+                ? (Func<IWebElement, bool>)null
+                : e => textMatcher.TextMatches(e, textPattern);
+
+            if (textPattern != null && scope.ConsiderInvisibleElements)
+                throw new NotSupportedException("Cannot inspect the text of invisible elements.");
+
+            var queryDesciption = "css: " + cssSelector;
+            if (textPattern != null)
+                queryDesciption += " with text matching /" + textPattern + "/";
+
             return FindAll(By.CssSelector(cssSelector),scope).Select(BuildElement).Cast<ElementFound>();
         }
 
@@ -161,9 +163,9 @@ namespace Coypu.Drivers.Selenium
             return elementFinder.Find(by, scope, queryDescription, predicate);
         }
 
-        private IEnumerable<IWebElement> FindAll(By by, Scope scope)
+        private IEnumerable<IWebElement> FindAll(By by, Scope scope, Func<IWebElement, bool> predicate = null)
         {
-            return elementFinder.FindAll(by, scope);
+            return elementFinder.FindAll(by, scope, predicate);
         }
 
         private SeleniumElement BuildElement(IWebElement element)
@@ -173,20 +175,6 @@ namespace Coypu.Drivers.Selenium
                 return new SeleniumFrame(element, webDriver);
             }
             return new SeleniumElement(element, webDriver);
-        }
-
-        private string GetContent(Scope scope)
-        {
-            var seleniumScope = elementFinder.SeleniumScope(scope);
-            return seleniumScope is RemoteWebDriver
-                       ? GetText(By.CssSelector("body"), seleniumScope)
-                       : GetText(By.XPath("."), seleniumScope);
-        }
-
-        private string GetText(By xpath, ISearchContext seleniumScope)
-        {   
-            var pageText = seleniumScope.FindElement(xpath).Text;
-            return NormalizeCRLFBetweenBrowserImplementations(pageText);
         }
 
         public bool HasXPath(string xpath, Scope scope)

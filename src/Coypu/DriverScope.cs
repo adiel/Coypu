@@ -54,7 +54,7 @@ namespace Coypu
 
         public string Text
         {
-            get { return Now().Text; }
+            get { return Find().Text; }
         }
 
         public bool ConsiderInvisibleElements
@@ -75,11 +75,6 @@ namespace Coypu
         public Browser Browser
         {
             get { return SessionConfiguration.Browser; }
-        }
-
-        internal ElementFound Find(QueryFinder query)
-        {
-            return Options.Find(query);
         }
 
         public Options Options
@@ -369,17 +364,12 @@ namespace Coypu
         /// </summary>
         /// <returns></returns>
         /// <exception cref="T:Coypu.MissingHtmlException">Thrown if the element cannot be found</exception>
-        public virtual ElementFound Now()
-        {
-            return FindElement();
-        }
-
-        protected internal ElementFound FindElement()
+        /// <exception cref="T:Coypu.AmbiguousHtmlException">Thrown if the there is more than one matching element and the Match.Single option is set</exception>
+        public virtual ElementFound Find()
         {
             if (element == null || element.Stale(options))
-                element = elementFinder.Find();
+                element = elementFinder.ResolveQuery();
             return element;
         }
-
     }
 }

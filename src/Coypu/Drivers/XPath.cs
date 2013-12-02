@@ -120,17 +120,7 @@ namespace Coypu.Drivers
 
         private static readonly string[] InputButtonTypes = new[] { "button", "submit", "image", "reset" };
 
-        public IEnumerable<string> ButtonXPathsByPrecedence(string locator, Options options)
-        {
-            var exact =  Button(locator, true);
-            if (options.Exact)
-                return new[] { exact };
-
-            var partial = Button(locator, false);
-            return new[] {exact, partial};
-        }
-
-        public string Button(string locator, bool exact)
+        public string Button(string locator, Options options)
         {
             return Format(
                 ".//*[" + IsInputButton() +
@@ -138,7 +128,7 @@ namespace Coypu.Drivers
                 "     or " + XPathNodeHasOneOfClasses("button", "btn") +
                 "     or @role = 'button'" +
                 "   ][" + AttributesMatchLocator(locator, true, "@id", "@name") + 
-                "     or " + AttributesMatchLocator(locator.Trim(), exact, "@value", "@alt", "normalize-space()") + 
+                "     or " + AttributesMatchLocator(locator.Trim(), options.Exact, "@value", "@alt", "normalize-space()") + 
                 "]",
                 locator.Trim());
         }
@@ -151,6 +141,11 @@ namespace Coypu.Drivers
         private string IsInputButton()
         {
             return "(" + TagNamedOneOf("input") + " and " + AttributeIsOneOf("type", InputButtonTypes) + ")";
+        }
+
+        public string Fieldset(string locator, Options options)
+        {
+            return Format(".//fieldset[legend[" + IsText(locator, options.Exact) + "] or @id = {0}]", locator);
         }
 
         private static readonly string[] FieldTagNames = new[] { "input", "select", "textarea" };
@@ -171,22 +166,28 @@ namespace Coypu.Drivers
             return exact.Concat(partial);
         }
 
+        public string Field(string locator, Options options)
+        {
+            return ForlabeledOrByAttribute(locator, options);
+        }
+
         private IEnumerable<string> FieldXPaths(string locator, Scope scope, bool exact)
         {
+            var options = new Options {Exact = exact, ConsiderInvisibleElements = scope.ConsiderInvisibleElements};
             return new[]
                 {
-                    ForlabeledOrByAttribute(locator, scope, exact),
+                    ForlabeledOrByAttribute(locator, options),
                     ContainerLabeled(locator, exact),
                 };
         }
 
-        private string ForlabeledOrByAttribute(string locator, Scope scope, bool exact)
+        private string ForlabeledOrByAttribute(string locator, Options options)
         {
             return Format(
                 ".//*[" + TagNamedOneOf(FieldTagNames) +
                 "   and " +
-                "   (" + IsLabelledWith(locator, exact) +
-                "      or " + HasIdOrPlaceholder(locator, scope, exact) +
+                "   (" + IsLabelledWith(locator, options.Exact) +
+                "      or " + HasIdOrPlaceholder(locator, options) +
                 "      or " + HasName(locator) +
                 "      or " + HasValue(locator) +
                 "   )" +
@@ -214,9 +215,9 @@ namespace Coypu.Drivers
             return Format("((" + AttributeIsOneOf("type", FindByNameTypes) + " or not(@type)) and @name = {0})", locator);
         }
 
-        private string HasIdOrPlaceholder(string locator, Scope scope, bool exact)
+        private string HasIdOrPlaceholder(string locator, Options options)
         {
-            return Format("(" + IsAFieldInputType(scope) + " and " + "(@id = {0} or " + Is("@placeholder", locator, exact) + "))", locator);
+            return Format("(" + IsAFieldInputType(options) + " and " + "(@id = {0} or " + Is("@placeholder", locator, options.Exact) + "))", locator);
         }
 
         private string Is(string selector, string locator, bool exact)
@@ -231,9 +232,9 @@ namespace Coypu.Drivers
             return Is("normalize-space()", locator,exact);
         }
 
-        private string IsAFieldInputType(Scope scope)
+        private string IsAFieldInputType(Options options)
         {
-            var fieldInputTypes = scope.ConsiderInvisibleElements
+            var fieldInputTypes = options.ConsiderInvisibleElements
                             ? FieldInputTypeWithHidden
                             : FieldInputTypes;
 

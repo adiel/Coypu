@@ -146,11 +146,6 @@ namespace Coypu.Tests.TestDoubles
             return null;
         }
 
-        public ElementFound FindFieldset(string locator, Scope scope)
-        {
-            return null;
-        }
-
         public ElementFound FindSection(string locator, Scope scope)
         {
             return null;

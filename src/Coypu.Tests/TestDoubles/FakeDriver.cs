@@ -223,11 +223,6 @@ namespace Coypu.Tests.TestDoubles
             return Find<string>(stubbedExecuteScriptResults, javascript, scope);
         }
 
-        public ElementFound FindFieldset(string locator, Scope scope)
-        {
-            return Find<ElementFound>(stubbedFieldsets, locator, scope);
-        }
-
         public ElementFound FindSection(string locator, Scope scope)
         {
             return Find<ElementFound>(stubbedSections, locator, scope);

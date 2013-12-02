@@ -7,7 +7,7 @@ namespace Coypu.Finders
     {
         internal ButtonFinder(Driver driver, string locator, DriverScope scope) : base(driver, locator, scope) { }
 
-        protected override Func<string, bool, string> GetQuery(XPath xpath)
+        protected override Func<string, Options, string> GetQuery(XPath xpath)
         {
             return xpath.Button;
         }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Coypu.Finders
 {
     internal class DocumentElementFinder : ElementFinder
@@ -6,9 +8,14 @@ namespace Coypu.Finders
         {
         }
 
-        internal override ElementFound Find()
+        internal override IEnumerable<ElementFound> Find(Options options = null)
         {
-            return Driver.Window;
+            return new [] {Driver.Window};
+        }
+
+        internal override string QueryDescription
+        {
+            get { return "Document Element"; }
         }
     }
 }
